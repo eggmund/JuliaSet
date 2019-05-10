@@ -22,12 +22,19 @@ vec4 get_color_pastelgreen(float norm) {
    return vec4(norm/3, norm, norm/2, 255);
 }
 
-vec4 get_color(float norm) {
+
+vec4 get_color_darkbluegrey(float norm) {
    norm = pow(norm, 1.0/6.0);
-   return vec4(norm/3, norm/2, norm, 255);
+   return vec4(norm/3, norm/2, norm/2, 255);
 }
 
-int julia() {
+vec4 get_color_turqoise(float norm) {
+   norm = pow(norm, 1.0/6.0);
+   return vec4(norm/1.5, norm, norm, 255);
+}
+
+
+float julia() {
    float zx = (((gl_FragCoord.x + offset.x)/screen_dims.x) * 2.5) * zoom;
    float zy = (((screen_dims.y - gl_FragCoord.y + offset.y)/screen_dims.y) * 1.5) * zoom;
    int iterations = 0;
@@ -44,5 +51,5 @@ int julia() {
 }
 
 void main() {
-   final_color = get_color(float(julia())/float(max_iterations));
+   final_color = get_color_turqoise(julia()/float(max_iterations));
 }

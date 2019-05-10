@@ -6,6 +6,7 @@ const SCREEN_H: i32 = 720;
 const HALF_SCREEN_W: i32 = SCREEN_W/2;
 const HALF_SCREEN_H: i32 = SCREEN_H/2;
 
+// Shader uniform locations
 const SHADER_SCREEN_DIMS_LOC: i32 = 0;
 const SHADER_MAX_ITERATIONS_LOC: i32 = 1;
 const SHADER_C_LOC: i32 = 2;
@@ -21,6 +22,8 @@ fn main() {
       .size(SCREEN_W, SCREEN_H)
       .title("Julia")
       .build();
+
+   rl.set_target_fps(61);
  
    let mut cx: f64 = -0.77322;
    let mut cy: f64 = 0.15868;
