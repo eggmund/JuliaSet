@@ -1,6 +1,6 @@
-use raylib::{consts, Color, Vector2, RaylibHandle};
+use raylib::{consts, Color, Vector2};
 
-const MAX_ITERATIONS: u64 = 500;
+const MAX_ITERATIONS: u64 = 1000;
 const SCREEN_W: i32 = 1280;
 const SCREEN_H: i32 = 720;
 const HALF_SCREEN_W: i32 = SCREEN_W/2;
