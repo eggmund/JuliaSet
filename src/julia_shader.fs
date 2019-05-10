@@ -12,9 +12,19 @@ layout(location = 4) uniform float zoom;
 // Output fragment color
 out vec4 final_color;
 
-vec4 get_color(float norm) {
+vec4 get_color_bluepink(float norm) {
    norm = pow(norm, 1.0/6.0);
    return vec4(norm, norm/3, (norm/2) + 127, 255);
+}
+
+vec4 get_color_pastelgreen(float norm) {
+   norm = pow(norm, 1.0/6.0);
+   return vec4(norm/3, norm, norm/2, 255);
+}
+
+vec4 get_color(float norm) {
+   norm = pow(norm, 1.0/6.0);
+   return vec4(norm/3, norm/2, norm, 255);
 }
 
 int julia() {
