@@ -13,28 +13,28 @@ layout(location = 4) uniform float zoom;
 out vec4 final_color;
 
 vec4 get_color_bluepink(float norm) {
-   norm = pow(norm, 1.0/6.0);
+   norm = pow(norm, 1.0/2.0);
    return vec4(norm, norm/3, (norm/2) + 127, 255);
 }
 
 vec4 get_color_pastelgreen(float norm) {
-   norm = pow(norm, 1.0/6.0);
+   norm = pow(norm, 1.0/2.0);
    return vec4(norm/3, norm, norm/2, 255);
 }
 
 
 vec4 get_color_darkbluegrey(float norm) {
-   norm = pow(norm, 1.0/6.0);
+   norm = pow(norm, 1.0/2.0);
    return vec4(norm/3, norm/2, norm/2, 255);
 }
 
 vec4 get_color_turqoise(float norm) {
-   norm = pow(norm, 1.0/6.0);
+   norm = pow(norm, 1.0/2.0);
    return vec4(norm/1.5, norm, norm, 255);
 }
 
 
-float julia() {
+int julia() {
    float zx = (((gl_FragCoord.x + offset.x)/screen_dims.x) * 2.5) * zoom;
    float zy = (((screen_dims.y - gl_FragCoord.y + offset.y)/screen_dims.y) * 1.5) * zoom;
    int iterations = 0;
@@ -44,12 +44,12 @@ float julia() {
       zy = 2.0 * zx * zy + c.y;
       zx = xtemp + c.x;
 
-      iterations++;
+      iterations += 1;
    }
 
    return iterations;
 }
 
 void main() {
-   final_color = get_color_turqoise(julia()/float(max_iterations));
+   final_color = get_color_turqoise(float(julia())/float(max_iterations));
 }

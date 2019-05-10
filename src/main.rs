@@ -1,6 +1,6 @@
 use raylib::{consts, Color, Vector2};
 
-const MAX_ITERATIONS: u64 = 1000;
+const MAX_ITERATIONS: u64 = 500;
 const SCREEN_W: i32 = 1280;
 const SCREEN_H: i32 = 720;
 const HALF_SCREEN_W: i32 = SCREEN_W/2;
@@ -13,7 +13,7 @@ const SHADER_C_LOC: i32 = 2;
 const SHADER_OFFSET_LOC: i32 = 3;
 const SHADER_ZOOM_LOC: i32 = 4;
 
-const MOUSE_SCROLL_SPEED: f64 = 0.0005;
+const MOUSE_SCROLL_SPEED: f64 = 0.01;
 const AUTO_SPEED: f64 = 0.005;
 
 
@@ -60,9 +60,13 @@ fn main() {
       if mouse_mv.abs() > 0 {
          if forward { forward = false };
          if backward { backward = false };
+         let mut amount = MOUSE_SCROLL_SPEED * mouse_mv as f64;
+         if rl.is_key_down(consts::KEY_LEFT_SHIFT as i32) {
+            amount = amount/10.0;
+         }
 
-         cx += MOUSE_SCROLL_SPEED * mouse_mv as f64;
-         cy += MOUSE_SCROLL_SPEED * mouse_mv as f64;
+         cx += amount;
+         cy += amount;
          rl.set_shader_value(&mut shader, SHADER_C_LOC, &[cx as f32, cy as f32]);
       }
 
