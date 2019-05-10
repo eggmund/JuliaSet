@@ -1,6 +1,6 @@
 use raylib::{consts, Color, Vector2};
 
-const MAX_ITERATIONS: u64 = 255;
+const MAX_ITERATIONS: u64 = 512;
 const SCREEN_W: i32 = 1920;
 const SCREEN_H: i32 = 1080;
 const HALF_SCREEN_W: i32 = SCREEN_W/2;
@@ -24,7 +24,7 @@ fn main() {
       .title("Julia")
       .build();
 
-   rl.set_target_fps(144);
+   rl.set_target_fps(60);
    
    let points_of_interest: Vec<[f64; 2]> = vec![
       [-0.8, 0.156],
@@ -33,8 +33,8 @@ fn main() {
       [-0.835, -0.2321]
    ];
  
-   let mut cx: f64 = points_of_interest[1][0];
-   let mut cy: f64 = points_of_interest[1][1];
+   let mut cx: f64 = points_of_interest[3][0];
+   let mut cy: f64 = points_of_interest[3][1];
 
    let offset = Vector2 { x: -HALF_SCREEN_W as f32, y: -HALF_SCREEN_H as f32 };
    let zoom: f64 = 2.0;

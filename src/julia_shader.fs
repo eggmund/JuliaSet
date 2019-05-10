@@ -19,6 +19,13 @@ vec2 complex_square(vec2 z) {
    );
 }
 
+vec3 hsv2rgb(vec3 c) {
+   vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+   vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+   return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+}
+
+
 vec4 get_color_bluepink(float norm) {
    norm = pow(norm, 1.0/6.0);
    return vec4(norm, norm/3.0, (norm/2.0) + 1.0, 1.0);
@@ -38,7 +45,20 @@ vec4 get_color_darkbluegrey(float norm) {
 vec4 get_color_turqoise(float norm) {
    norm = pow(norm, 1.0/2.0);
    return vec4(norm/1.5, norm, norm, 1.0);
-   //return vec4(norm, norm, norm, 1.0);
+}
+
+vec4 get_color_blue(float norm) {
+   float normsqrt = pow(norm, 1.0/2.0);
+   return vec4(norm*norm, norm, normsqrt, 1.0);
+}
+
+vec4 get_color_rust(float norm) {
+   float normsqrt = pow(norm, 1.0/2.0);
+   return vec4(normsqrt, norm, norm*norm, 1.0);
+}
+
+vec4 get_color_red2blue(float norm) {
+   return vec4(hsv2rgb(vec3(norm, 1.0, 1.0)), 1.0);
 }
 
 float julia() { // Returns between 0 and 1
@@ -53,10 +73,9 @@ float julia() { // Returns between 0 and 1
    }
    
    z = complex_square(z) + c;
-   z = complex_square(z) + c;
    return float(iterations) + 1.0 - (log(log(length(z)))/log(2.0));
 }
 
 void main() {
-   final_color = get_color_turqoise(julia()/float(max_iterations));
+   final_color = get_color_red2blue(julia()/float(max_iterations));
 }
