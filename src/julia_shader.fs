@@ -12,44 +12,51 @@ layout(location = 4) uniform float zoom;
 // Output fragment color
 out vec4 final_color;
 
+vec2 complex_square(vec2 z) {
+   return vec2(
+      z.x * z.x - z.y * z.y,
+      z.x * z.y * 2.0
+   );
+}
+
 vec4 get_color_bluepink(float norm) {
-   norm = pow(norm, 1.0/2.0);
-   return vec4(norm, norm/3, (norm/2) + 127, 255);
+   norm = pow(norm, 1.0/6.0);
+   return vec4(norm, norm/3.0, (norm/2.0) + 1.0, 1.0);
 }
 
 vec4 get_color_pastelgreen(float norm) {
    norm = pow(norm, 1.0/2.0);
-   return vec4(norm/3, norm, norm/2, 255);
+   return vec4(norm/3.0, norm, norm/2.0, 1.0);
 }
 
 
 vec4 get_color_darkbluegrey(float norm) {
    norm = pow(norm, 1.0/2.0);
-   return vec4(norm/3, norm/2, norm/2, 255);
+   return vec4(norm/3.0, norm/2.0, norm/2.0, 1.0);
 }
 
 vec4 get_color_turqoise(float norm) {
    norm = pow(norm, 1.0/2.0);
-   return vec4(norm/1.5, norm, norm, 255);
+   return vec4(norm/1.5, norm, norm, 1.0);
+   //return vec4(norm, norm, norm, 1.0);
 }
 
-
-int julia() {
-   float zx = (((gl_FragCoord.x + offset.x)/screen_dims.x) * 2.5) * zoom;
-   float zy = (((screen_dims.y - gl_FragCoord.y + offset.y)/screen_dims.y) * 1.5) * zoom;
+float julia() { // Returns between 0 and 1
+   vec2 z = vec2((((gl_FragCoord.x + offset.x)/screen_dims.x) * 2.5) * zoom, (((screen_dims.y - gl_FragCoord.y + offset.y)/screen_dims.y) * 1.5) * zoom);
    int iterations = 0;
    
-   while (zx * zx + zy * zy < 4.0 && iterations < max_iterations) {
-      float xtemp = zx * zx - zy * zy;
-      zy = 2.0 * zx * zy + c.y;
-      zx = xtemp + c.x;
-
-      iterations += 1;
+   for (iterations = 0; iterations < max_iterations; iterations++) {
+      z = complex_square(z) + c;
+      if (dot(z, z) > 4.0) { // zx * zx + zy * zy is dot product
+         break;
+      }
    }
-
-   return iterations;
+   
+   z = complex_square(z) + c;
+   z = complex_square(z) + c;
+   return float(iterations) + 1.0 - (log(log(length(z)))/log(2.0));
 }
 
 void main() {
-   final_color = get_color_turqoise(float(julia())/float(max_iterations));
+   final_color = get_color_turqoise(julia()/float(max_iterations));
 }

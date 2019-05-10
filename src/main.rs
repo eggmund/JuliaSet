@@ -1,8 +1,8 @@
 use raylib::{consts, Color, Vector2};
 
-const MAX_ITERATIONS: u64 = 500;
-const SCREEN_W: i32 = 1280;
-const SCREEN_H: i32 = 720;
+const MAX_ITERATIONS: u64 = 255;
+const SCREEN_W: i32 = 1920;
+const SCREEN_H: i32 = 1080;
 const HALF_SCREEN_W: i32 = SCREEN_W/2;
 const HALF_SCREEN_H: i32 = SCREEN_H/2;
 
@@ -17,18 +17,27 @@ const MOUSE_SCROLL_SPEED: f64 = 0.01;
 const AUTO_SPEED: f64 = 0.005;
 
 
+
 fn main() {
    let rl = raylib::init()
       .size(SCREEN_W, SCREEN_H)
       .title("Julia")
       .build();
 
-   rl.set_target_fps(61);
+   rl.set_target_fps(144);
+   
+   let points_of_interest: Vec<[f64; 2]> = vec![
+      [-0.8, 0.156],
+      [0.285, 0.0],
+      [0.285, 0.01],
+      [-0.835, -0.2321]
+   ];
  
-   let mut cx: f64 = -0.77322;
-   let mut cy: f64 = 0.15868;
+   let mut cx: f64 = points_of_interest[1][0];
+   let mut cy: f64 = points_of_interest[1][1];
+
    let offset = Vector2 { x: -HALF_SCREEN_W as f32, y: -HALF_SCREEN_H as f32 };
-   let zoom: f64 = 1.3;
+   let zoom: f64 = 2.0;
    let mut forward = false; // Slowly increase c stuff
    let mut backward = false; // Slowly decrease c stuff
 
