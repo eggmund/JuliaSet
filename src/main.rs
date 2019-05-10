@@ -1,6 +1,6 @@
-use raylib::{Color, Vector2, RaylibHandle};
+use raylib::{consts, Color, Vector2, RaylibHandle};
 
-const MAX_ITERATIONS: u64 = 200;
+const MAX_ITERATIONS: u64 = 500;
 const SCREEN_W: i32 = 1280;
 const SCREEN_H: i32 = 720;
 const HALF_SCREEN_W: i32 = SCREEN_W/2;
@@ -11,6 +11,9 @@ const SHADER_MAX_ITERATIONS_LOC: i32 = 1;
 const SHADER_C_LOC: i32 = 2;
 const SHADER_OFFSET_LOC: i32 = 3;
 const SHADER_ZOOM_LOC: i32 = 4;
+
+const MOUSE_SCROLL_SPEED: f64 = 0.0005;
+const AUTO_SPEED: f64 = 0.005;
 
 
 fn main() {
@@ -23,6 +26,8 @@ fn main() {
    let mut cy: f64 = 0.15868;
    let offset = Vector2 { x: -HALF_SCREEN_W as f32, y: -HALF_SCREEN_H as f32 };
    let zoom: f64 = 1.3;
+   let mut forward = false; // Slowly increase c stuff
+   let mut backward = false; // Slowly decrease c stuff
 
    let mut shader = rl.load_shader("", "src/julia_shader.fs");
    rl.set_shader_value(&mut shader, SHADER_SCREEN_DIMS_LOC, &[SCREEN_W as f32, SCREEN_H as f32]);
@@ -32,16 +37,49 @@ fn main() {
    rl.set_shader_value(&mut shader, SHADER_ZOOM_LOC, &[zoom as f32]);
 
    while !rl.window_should_close() {
-      let dt = rl.get_frame_time();
-      cx += -0.001 * dt as f64;
-      cy += -0.0001 * dt as f64;
-      rl.set_shader_value(&mut shader, SHADER_C_LOC, &[cx as f32, cy as f32]);
+      if rl.is_key_pressed(consts::KEY_LEFT as i32) { // Pressing left goes back, but if going back and left is pressed, stop altogether.
+         if backward {
+            backward = false;
+         } else {
+            backward = true;
+            forward = false;
+         }
+      } else if rl.is_key_pressed(consts::KEY_RIGHT as i32) {
+         if forward {
+            forward = false;
+         } else {
+            forward = true;
+            backward = false;
+         }
+      }
 
+      let mouse_mv = rl.get_mouse_wheel_move();
+      if mouse_mv.abs() > 0 {
+         if forward { forward = false };
+         if backward { backward = false };
+
+         cx += MOUSE_SCROLL_SPEED * mouse_mv as f64;
+         cy += MOUSE_SCROLL_SPEED * mouse_mv as f64;
+         rl.set_shader_value(&mut shader, SHADER_C_LOC, &[cx as f32, cy as f32]);
+      }
+
+      if forward || backward {
+         let dt = rl.get_frame_time();
+         let amount = AUTO_SPEED * dt as f64;
+         if forward {
+            if backward { backward = false };
+            cx += amount;
+            cy += amount;
+         } else if backward {
+            cx -= amount;
+            cy -= amount;
+         }
+         rl.set_shader_value(&mut shader, SHADER_C_LOC, &[cx as f32, cy as f32]);
+      }
 
       rl.begin_drawing();
       rl.clear_background(Color::BLACK);
 
-      //run_julia(&rl, Vector2 { x: -HALF_SCREEN_W as f32, y: -HALF_SCREEN_H as f32 }, zoom, cx, cy);
       rl.begin_shader_mode(&shader);
       rl.draw_rectangle(0, 0, SCREEN_W, SCREEN_H, Color::BLACK);
       rl.end_shader_mode();

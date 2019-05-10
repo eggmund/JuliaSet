@@ -18,8 +18,8 @@ vec4 get_color(float norm) {
 }
 
 int julia() {
-   float zx = ((gl_FragCoord.x + offset.x)/screen_dims.x) * 2.5;
-   float zy = ((screen_dims.y - gl_FragCoord.y + offset.y)/screen_dims.y) * 1.5;
+   float zx = (((gl_FragCoord.x + offset.x)/screen_dims.x) * 2.5) * zoom;
+   float zy = (((screen_dims.y - gl_FragCoord.y + offset.y)/screen_dims.y) * 1.5) * zoom;
    int iterations = 0;
    
    while (zx * zx + zy * zy < 4.0 && iterations < max_iterations) {
