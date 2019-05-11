@@ -12,6 +12,7 @@ const SHADER_MAX_ITERATIONS_LOC: i32 = 1;
 const SHADER_C_LOC: i32 = 2;
 const SHADER_OFFSET_LOC: i32 = 3;
 const SHADER_ZOOM_LOC: i32 = 4;
+const SHADER_TIME_LOC: i32 = 5;
 
 const MOUSE_SCROLL_SPEED: f64 = 0.01;
 const AUTO_SPEED: f64 = 0.005;
@@ -24,7 +25,7 @@ fn main() {
       .title("Julia")
       .build();
 
-   rl.set_target_fps(60);
+   rl.set_target_fps(144);
    
    let points_of_interest: Vec<[f64; 2]> = vec![
       [-0.8, 0.156],
@@ -33,8 +34,8 @@ fn main() {
       [-0.835, -0.2321]
    ];
  
-   let mut cx: f64 = points_of_interest[3][0];
-   let mut cy: f64 = points_of_interest[3][1];
+   let mut cx: f64 = points_of_interest[0][0];
+   let mut cy: f64 = points_of_interest[0][1];
 
    let offset = Vector2 { x: -HALF_SCREEN_W as f32, y: -HALF_SCREEN_H as f32 };
    let zoom: f64 = 2.0;
@@ -81,6 +82,7 @@ fn main() {
 
       if forward || backward {
          let dt = rl.get_frame_time();
+         //rl.set_shader_value(&mut shader, SHADER_TIME_LOC, &[rl.get_time()]);
          let amount = AUTO_SPEED * dt as f64;
          if forward {
             if backward { backward = false };

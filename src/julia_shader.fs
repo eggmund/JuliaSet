@@ -8,7 +8,6 @@ layout(location = 3) uniform vec2 offset;
 layout(location = 4) uniform float zoom;
 
 
-
 // Output fragment color
 out vec4 final_color;
 
@@ -77,9 +76,10 @@ float julia() { // Returns between 0 and 1
    }
    
    z = complex_square(z) + c;
+   //return float(iterations) + (log(log(length(z)))/log(2.0)) blobb
    return float(iterations) + 1.0 - (log(log(length(z)))/log(2.0));
 }
 
 void main() {
-   final_color = get_color_blue2red(julia()/float(max_iterations));
+   final_color = get_color_red2blue(julia()/float(max_iterations));
 }
