@@ -35,7 +35,6 @@ vec4 get_color_pastelgreen(float norm) {
    return vec4(norm/3.0, norm, norm/2.0, 1.0);
 }
 
-
 vec4 get_color_darkbluegrey(float norm) {
    norm = pow(norm, 1.0/2.0);
    return vec4(norm/3.0, norm/2.0, norm/2.0, 1.0);
@@ -77,7 +76,7 @@ void main() {
    
    z = complex_square(z) + c;
 
-   //return float(iterations) + (log(log(length(z)))/log(2.0)) blobb
+   //float smooth_val = float(iterations) - 1.0 + (log(log(length(z)))/log(2.0));  // blobb
    float smooth_val = float(iterations) + 1.0 - (log(log(length(z)))/log(2.0));
    float norm = smooth_val/float(max_iterations);
 

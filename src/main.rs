@@ -14,12 +14,12 @@ const SHADER_OFFSET_LOC: i32 = 3;
 const SHADER_ZOOM_LOC: i32 = 4;
 
 const MOUSE_SCROLL_SPEED: f32 = 0.01;
-const AUTO_SPEED: f32 = 0.001;
+const AUTO_SPEED: f32 = 0.01;
 
 #[inline]
-fn change_c(rl: &RaylibHandle, c: &mut [f32; 2], mut amount: f32) {
+fn increment_c(rl: &RaylibHandle, c: &mut [f32; 2], mut amount: f32) {
    if rl.is_key_down(consts::KEY_LEFT_SHIFT as i32) {
-      amount = amount/10.0;
+      amount = amount/4.0;
    }
 
    c[0] += amount;
@@ -42,7 +42,7 @@ fn main() {
       [-0.35309, 0.60291]
    ];
  
-   let mut c: [f32; 2] = [points_of_interest[4][0], points_of_interest[4][1]];
+   let mut c: [f32; 2] = points_of_interest[4];
 
    let offset = Vector2 { x: -HALF_SCREEN_W as f32, y: -HALF_SCREEN_H as f32 };
    let zoom: f32 = 2.0;
@@ -73,11 +73,29 @@ fn main() {
          }
       }
 
+      if rl.is_key_pressed(consts::KEY_ONE as i32) {
+         c = points_of_interest[0];
+         rl.set_shader_value(&mut shader, SHADER_C_LOC, &c);
+      } else if rl.is_key_pressed(consts::KEY_TWO as i32) {
+         c = points_of_interest[1];
+         rl.set_shader_value(&mut shader, SHADER_C_LOC, &c);
+      } else if rl.is_key_pressed(consts::KEY_THREE as i32) {
+         c = points_of_interest[2];
+         rl.set_shader_value(&mut shader, SHADER_C_LOC, &c);
+      } else if rl.is_key_pressed(consts::KEY_FOUR as i32) {
+         c = points_of_interest[3];
+         rl.set_shader_value(&mut shader, SHADER_C_LOC, &c);
+      } else if rl.is_key_pressed(consts::KEY_FIVE as i32) {
+         c = points_of_interest[4];
+         rl.set_shader_value(&mut shader, SHADER_C_LOC, &c);
+      }
+
+
       let mouse_mv = rl.get_mouse_wheel_move();
       if mouse_mv.abs() > 0 {
          if forward { forward = false };
          if backward { backward = false };
-         change_c(&rl, &mut c, MOUSE_SCROLL_SPEED * mouse_mv as f32);
+         increment_c(&rl, &mut c, MOUSE_SCROLL_SPEED * mouse_mv as f32);
          rl.set_shader_value(&mut shader, SHADER_C_LOC, &c);
       }
 
@@ -89,9 +107,9 @@ fn main() {
          }
          if forward {
             if backward { backward = false };
-            change_c(&rl, &mut c, amount);
+            increment_c(&rl, &mut c, amount);
          } else if backward {
-            change_c(&rl, &mut c, -amount);
+            increment_c(&rl, &mut c, -amount);
          }
          rl.set_shader_value(&mut shader, SHADER_C_LOC, &c);
       }
