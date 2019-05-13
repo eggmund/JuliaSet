@@ -1,4 +1,4 @@
-use raylib::{consts, Color, Vector2};
+use raylib::{consts, Color, Vector2, RaylibHandle};
 
 const MAX_ITERATIONS: u64 = 512;
 const SCREEN_W: i32 = 1920;
@@ -12,12 +12,19 @@ const SHADER_MAX_ITERATIONS_LOC: i32 = 1;
 const SHADER_C_LOC: i32 = 2;
 const SHADER_OFFSET_LOC: i32 = 3;
 const SHADER_ZOOM_LOC: i32 = 4;
-const SHADER_TIME_LOC: i32 = 5;
 
-const MOUSE_SCROLL_SPEED: f64 = 0.01;
-const AUTO_SPEED: f64 = 0.005;
+const MOUSE_SCROLL_SPEED: f32 = 0.01;
+const AUTO_SPEED: f32 = 0.001;
 
+#[inline]
+fn change_c(rl: &RaylibHandle, c: &mut [f32; 2], mut amount: f32) {
+   if rl.is_key_down(consts::KEY_LEFT_SHIFT as i32) {
+      amount = amount/10.0;
+   }
 
+   c[0] += amount;
+   c[1] += amount;
+}
 
 fn main() {
    let rl = raylib::init()
@@ -25,27 +32,27 @@ fn main() {
       .title("Julia")
       .build();
 
-   rl.set_target_fps(144);
+   rl.set_target_fps(60);
    
-   let points_of_interest: Vec<[f64; 2]> = vec![
+   let points_of_interest: Vec<[f32; 2]> = vec![
       [-0.8, 0.156],
       [0.285, 0.0],
       [0.285, 0.01],
-      [-0.835, -0.2321]
+      [-0.835, -0.2321],
+      [-0.35309, 0.60291]
    ];
  
-   let mut cx: f64 = points_of_interest[0][0];
-   let mut cy: f64 = points_of_interest[0][1];
+   let mut c: [f32; 2] = [points_of_interest[4][0], points_of_interest[4][1]];
 
    let offset = Vector2 { x: -HALF_SCREEN_W as f32, y: -HALF_SCREEN_H as f32 };
-   let zoom: f64 = 2.0;
+   let zoom: f32 = 2.0;
    let mut forward = false; // Slowly increase c stuff
    let mut backward = false; // Slowly decrease c stuff
 
    let mut shader = rl.load_shader("", "src/julia_shader.fs");
    rl.set_shader_value(&mut shader, SHADER_SCREEN_DIMS_LOC, &[SCREEN_W as f32, SCREEN_H as f32]);
    rl.set_shader_value_i(&mut shader, SHADER_MAX_ITERATIONS_LOC, &[MAX_ITERATIONS as i32]);
-   rl.set_shader_value(&mut shader, SHADER_C_LOC, &[cx as f32, cy as f32]);
+   rl.set_shader_value(&mut shader, SHADER_C_LOC, &c);
    rl.set_shader_value(&mut shader, SHADER_OFFSET_LOC, &[offset.x, offset.y]);
    rl.set_shader_value(&mut shader, SHADER_ZOOM_LOC, &[zoom as f32]);
 
@@ -70,29 +77,23 @@ fn main() {
       if mouse_mv.abs() > 0 {
          if forward { forward = false };
          if backward { backward = false };
-         let mut amount = MOUSE_SCROLL_SPEED * mouse_mv as f64;
-         if rl.is_key_down(consts::KEY_LEFT_SHIFT as i32) {
-            amount = amount/10.0;
-         }
-
-         cx += amount;
-         cy += amount;
-         rl.set_shader_value(&mut shader, SHADER_C_LOC, &[cx as f32, cy as f32]);
+         change_c(&rl, &mut c, MOUSE_SCROLL_SPEED * mouse_mv as f32);
+         rl.set_shader_value(&mut shader, SHADER_C_LOC, &c);
       }
 
       if forward || backward {
          let dt = rl.get_frame_time();
-         //rl.set_shader_value(&mut shader, SHADER_TIME_LOC, &[rl.get_time()]);
-         let amount = AUTO_SPEED * dt as f64;
+         let mut amount = AUTO_SPEED * dt as f32;
+         if rl.is_key_down(consts::KEY_LEFT_SHIFT as i32) {
+            amount = amount/10.0;
+         }
          if forward {
             if backward { backward = false };
-            cx += amount;
-            cy += amount;
+            change_c(&rl, &mut c, amount);
          } else if backward {
-            cx -= amount;
-            cy -= amount;
+            change_c(&rl, &mut c, -amount);
          }
-         rl.set_shader_value(&mut shader, SHADER_C_LOC, &[cx as f32, cy as f32]);
+         rl.set_shader_value(&mut shader, SHADER_C_LOC, &c);
       }
 
       rl.begin_drawing();
@@ -103,7 +104,7 @@ fn main() {
       rl.end_shader_mode();
 
       rl.draw_fps(10, SCREEN_H - 25);
-      rl.draw_text(format!("frame time: {:.5}\ncx: {:.5}\ncy: {:.5}", rl.get_frame_time(), cx, cy).as_str(), 10, 10, 20, Color::RAYWHITE);
+      rl.draw_text(format!("frame time: {:.5}\ncx: {:.5}\ncy: {:.5}", rl.get_frame_time(), c[0], c[1]).as_str(), 10, 10, 20, Color::RAYWHITE);
       rl.end_drawing();
    }
 }

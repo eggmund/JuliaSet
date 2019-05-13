@@ -64,7 +64,7 @@ vec4 get_color_blue2red(float norm) {
    return vec4(hsv2rgb(vec3(0.5 - norm, 1.0, 1.0)), 1.0);
 }
 
-float julia() { // Returns between 0 and 1
+void main() {
    vec2 z = vec2((((gl_FragCoord.x + offset.x)/screen_dims.x) * 2.5) * zoom, (((screen_dims.y - gl_FragCoord.y + offset.y)/screen_dims.y) * 1.5) * zoom);
    int iterations = 0;
    
@@ -76,10 +76,14 @@ float julia() { // Returns between 0 and 1
    }
    
    z = complex_square(z) + c;
-   //return float(iterations) + (log(log(length(z)))/log(2.0)) blobb
-   return float(iterations) + 1.0 - (log(log(length(z)))/log(2.0));
-}
 
-void main() {
-   final_color = get_color_red2blue(julia()/float(max_iterations));
+   //return float(iterations) + (log(log(length(z)))/log(2.0)) blobb
+   float smooth_val = float(iterations) + 1.0 - (log(log(length(z)))/log(2.0));
+   float norm = smooth_val/float(max_iterations);
+
+   if (norm > 0.9999) {
+      final_color = vec4(0.0, 0.0, 0.0, 1.0);
+   } else {
+      final_color = get_color_red2blue(norm);
+   }
 }
